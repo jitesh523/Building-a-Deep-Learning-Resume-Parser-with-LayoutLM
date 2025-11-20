@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 def analyze_resume(resume_text, job_sections, api_key):
     try:
         logger.info("Starting LLM resume analysis")
-        llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=api_key)
+        llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=api_key)
         if not llm:
             logger.error("Failed to initialize LLM")
             return "Analysis failed."
@@ -17,13 +17,19 @@ def analyze_resume(resume_text, job_sections, api_key):
         prompt = ChatPromptTemplate.from_messages([
             ("system", """
             You are a recruiter. Analyze how well the resume matches the job description sections provided.
-            Provide a structured response with:
-            - Overall Match: <0-100>% - One sentence summary of overall fit.
-            - Education Match: <0-100>% - One sentence summary.
-            - Experience Match: <0-100>% - One sentence summary.
-            - Skills Match: <0-100>% - One sentence summary.
-            - Suggestions: 2-3 short improvement tips.
-            Be concise and specific. Use the exact format above.
+            
+            CRITICAL: You MUST provide your response in EXACTLY this format (including the exact labels and percentage signs):
+            
+            Overall Match: <number>% - <one sentence summary>
+            Education Match: <number>% - <one sentence summary>
+            Experience Match: <number>% - <one sentence summary>
+            Skills Match: <number>% - <one sentence summary>
+            Suggestions:
+            - <suggestion 1>
+            - <suggestion 2>
+            - <suggestion 3>
+            
+            Replace <number> with a score from 0-100. Be concise and specific.
             """),
             ("user", """
             Job Description Sections:
